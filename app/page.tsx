@@ -5,10 +5,10 @@ export default function Home() {
         {["Nico", "Me", "You", "Yourself", ""].map((person, index) => (
           <div
             key={index}
-            className="flex items-center gap-5 odd:bg-gray-100 even:bg-cyan-100 p-2.5 rounded-xl border-b-2 pb-5 last:border-green-300 first:border-red-300 "
+            className="flex items-center gap-5 odd:bg-gray-100 even:bg-cyan-100 p-2.5 rounded-xl border-b-2 pb-5 last:border-green-300 first:border-red-300 group"
           >
             <div className="size-10 bg-blue-400 rounded-full" />
-            <div className="w-20 rounded-full empty:w-24 empty:h-5 empty:rounded-full empty:animate-pulse empty:bg-gray-400">
+            <div className="w-20 rounded-full empty:w-24 empty:h-5 empty:rounded-full empty:animate-pulse empty:bg-gray-400 group-hover:text-red-500">
               {person}
             </div>
             <div className="size-6 bg-red-500 text-white flex items-center justify-center rounded-full animate-bounce relative">
@@ -17,6 +17,16 @@ export default function Home() {
             </div>
           </div>
         ))}
+        <div className="group flex flex-col">
+          <input
+            className="bg-gray-100 w-full"
+            placeholder="Write your email"
+          />
+          <span className="hidden group-focus-within:block ">
+            Make sure it is a valid email
+          </span>
+          <button>Submit</button>
+        </div>
       </div>
     </main>
   );
