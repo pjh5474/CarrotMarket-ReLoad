@@ -38,7 +38,7 @@ export default function CreateAccountPage() {
           required
           errors={[]}
         />
-        <FormButton loading={false} text="Create Account" />
+        <FormButton text="Create Account" />
       </form>
       <SocilaLogin />
     </div>

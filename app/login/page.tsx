@@ -5,7 +5,8 @@ import SocilaLogin from "@/components/social-login";
 export default function LoginPage() {
   const handleForm = async (formData: FormData) => {
     "use server";
-    console.log(formData.get("email"), formData.get("password"));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    console.log("Logged in !");
   };
   return (
     <div className="flex flex-col gap-10 py-8 px-6">
@@ -28,7 +29,7 @@ export default function LoginPage() {
           required
           errors={[]}
         />
-        <FormButton loading={false} text="Login" />
+        <FormButton text="Login" />
       </form>
       <SocilaLogin />
     </div>
