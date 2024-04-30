@@ -6,3 +6,13 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique
+  email String? @unique
+  password String?
+  phone String? @unique
+  github_id String? @unique
+  avatar String? @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWtg5J3C5iNnqUBT2j5FHXP752KaiTG-NENPeYXad5fg&s")
+}
