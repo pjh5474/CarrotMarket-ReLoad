@@ -3,7 +3,7 @@
 import Button from "@/components/button";
 import Input from "@/components/input";
 import { useFormState } from "react-dom";
-import { smsLogin } from "./actions";
+import { smsLogIn } from "./actions";
 import {
   VALIDATION_TOKEN_MAX_LENGTH,
   VALIDATION_TOKEN_MIN_LENGTH,
@@ -15,7 +15,7 @@ const initialState = {
 };
 
 export default function SMSLogin() {
-  const [state, dispatch] = useFormState(smsLogin, initialState);
+  const [state, dispatch] = useFormState(smsLogIn, initialState);
   return (
     <div className="flex flex-col gap-10 py-8 px-6">
       <div className="flex flex-col gap-2 *:font-medium">
@@ -32,6 +32,7 @@ export default function SMSLogin() {
             required
             min={VALIDATION_TOKEN_MIN_LENGTH}
             max={VALIDATION_TOKEN_MAX_LENGTH}
+            errors={state.error?.formErrors}
           />
         ) : (
           <Input

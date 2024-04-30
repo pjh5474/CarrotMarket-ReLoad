@@ -22,10 +22,9 @@ const tokenSchema = z.coerce
 
 interface ActionState {
   token: boolean;
-  error?: string[];
 }
 
-export async function smsLogin(prevState: ActionState, formData: FormData) {
+export async function smsLogIn(prevState: ActionState, formData: FormData) {
   const phone = formData.get("phone");
   const token = formData.get("token");
   if (!prevState.token) {
