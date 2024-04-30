@@ -29,30 +29,6 @@ const checkPasswords = ({
   confirmPassword: string;
 }) => password === confirmPassword;
 
-const checkUniqueUsername = async (username: string) => {
-  const user = await db.user.findUnique({
-    where: {
-      username,
-    },
-    select: {
-      id: true,
-    },
-  });
-  return !Boolean(user);
-};
-
-const checkUniqueEmail = async (email: string) => {
-  const user = await db.user.findUnique({
-    where: {
-      email,
-    },
-    select: {
-      id: true,
-    },
-  });
-  return !Boolean(user);
-};
-
 const formSchema = z
   .object({
     username: z
@@ -61,15 +37,13 @@ const formSchema = z
       })
       .min(USERNAME_MIN_LENGTH, USERNAME_LENGTH_ERROR_MESSAGE)
       .max(USERNAME_MAX_LENGTH, USERNAME_LENGTH_ERROR_MESSAGE)
-      .trim()
-      .refine(checkUniqueUsername, USERNAME_UNIQUE_ERROR_MESSAGE),
+      .trim(),
     email: z
       .string({
         required_error: REQUIRED_ERROR_MESSAGE("이메일"),
       })
       .email()
-      .toLowerCase()
-      .refine(checkUniqueEmail, EMAIL_UNIQUE_ERROR_MESSAGE),
+      .toLowerCase(),
     password: z
       .string({
         required_error: REQUIRED_ERROR_MESSAGE("비밀번호"),
@@ -82,6 +56,44 @@ const formSchema = z
       .string()
       .min(PASSWORD_MIN_LENGTH, PASSWORD_LENGTH_ERROR_MESSAGE)
       .max(PASSWORD_MAX_LENGTH, PASSWORD_LENGTH_ERROR_MESSAGE),
+  })
+  .superRefine(async ({ username }, ctx) => {
+    const user = await db.user.findUnique({
+      where: {
+        username,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (user) {
+      ctx.addIssue({
+        code: "custom",
+        message: USERNAME_UNIQUE_ERROR_MESSAGE,
+        path: ["username"],
+        fatal: true,
+      });
+      return z.NEVER;
+    }
+  })
+  .superRefine(async ({ email }, ctx) => {
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (user) {
+      ctx.addIssue({
+        code: "custom",
+        message: EMAIL_UNIQUE_ERROR_MESSAGE,
+        path: ["email"],
+        fatal: true,
+      });
+      return z.NEVER;
+    }
   })
   .refine(checkPasswords, {
     message: PASSWORD_CHECK_ERROR_MESSAGE,
