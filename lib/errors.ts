@@ -1,5 +1,6 @@
 export const USERNAME_UNIQUE_ERROR_MESSAGE = "이미 사용 중인 닉네임 입니다.";
 export const EMAIL_UNIQUE_ERROR_MESSAGE = "이미 사용 중인 이메일 입니다.";
+export const LOGIN_ERROR_MESSAGE = "이메일과 비밀번호를 확인해주세요.";
 export const USERNAME_LENGTH_ERROR_MESSAGE =
   "Username 은 3 글자 이상, 10 글자 이하여야 합니다.";
 
