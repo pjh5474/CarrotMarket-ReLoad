@@ -1,12 +1,14 @@
 "use server";
 
 import {
-  PASSWORD_LENGTH_ERROR_MESSAGE,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
   PASSWORD_REGEX,
-  PASSWORD_REGEX_ERROR_MESSAGE,
 } from "@/lib/constants";
+import {
+  PASSWORD_LENGTH_ERROR_MESSAGE,
+  PASSWORD_REGEX_ERROR_MESSAGE,
+} from "@/lib/errors";
 import { z } from "zod";
 
 const formSchema = z.object({
