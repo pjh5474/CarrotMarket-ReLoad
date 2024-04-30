@@ -9,8 +9,13 @@ import {
   VALIDATION_TOKEN_MIN_LENGTH,
 } from "@/lib/constants";
 
+const initialState = {
+  token: false,
+  error: undefined,
+};
+
 export default function SMSLogin() {
-  const [state, dispatch] = useFormState(smsLogin, null);
+  const [state, dispatch] = useFormState(smsLogin, initialState);
   return (
     <div className="flex flex-col gap-10 py-8 px-6">
       <div className="flex flex-col gap-2 *:font-medium">
@@ -18,16 +23,27 @@ export default function SMSLogin() {
         <h2 className="text-xl">Verify your phone number.</h2>
       </div>
       <form action={dispatch} className="flex flex-col gap-3">
-        <Input name="phone" type="text" placeholder="Phone number" required />
-        <Input
-          name="token"
-          type="number"
-          placeholder="Verification code"
-          required
-          min={VALIDATION_TOKEN_MIN_LENGTH}
-          max={VALIDATION_TOKEN_MAX_LENGTH}
-        />
-        <Button text="Verify" />
+        {state.token ? (
+          <Input
+            key="token"
+            name="token"
+            type="number"
+            placeholder="Verification code"
+            required
+            min={VALIDATION_TOKEN_MIN_LENGTH}
+            max={VALIDATION_TOKEN_MAX_LENGTH}
+          />
+        ) : (
+          <Input
+            key="phone"
+            name="phone"
+            type="text"
+            placeholder="Phone number"
+            required
+            errors={state.error?.formErrors}
+          />
+        )}
+        <Button text={state.token ? "Verify Token" : "Send Verification SMS"} />
       </form>
     </div>
   );
