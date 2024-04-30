@@ -1,11 +1,18 @@
 "use server";
+import {
+  PASSWORD_CHECK_ERROR_MESSAGE,
+  PASSWORD_LENGTH_ERROR_MESSAGE,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REGEX,
+  PASSWORD_REGEX_ERROR_MESSAGE,
+  REQUIRED_ERROR_MESSAGE,
+  USERNAME_LENGTH_ERROR_MESSAGE,
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+} from "@/lib/constants";
 import { z } from "zod";
 
-const passwordRegex = new RegExp(
-  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/
-);
-
-const checkUsername = (username: string) => !username.includes("potato");
 const checkPasswords = ({
   password,
   confirmPassword,
@@ -18,28 +25,32 @@ const formSchema = z
   .object({
     username: z
       .string({
-        invalid_type_error: "Username must be a string!",
-        required_error: "Where is my username???",
+        required_error: REQUIRED_ERROR_MESSAGE("닉네임"),
       })
-      .trim()
-      .min(3, "Username 은 3 글자 이상, 10 글자 미만이어야 합니다.")
-      .max(10, "Username 은 3 글자 이상, 10 글자 미만이어야 합니다.")
-      .transform((username) => `⭐ ${username}`)
-      .refine(checkUsername, "No potatoes allowed"),
-    email: z.string().email().toLowerCase(),
+      .min(USERNAME_MIN_LENGTH, USERNAME_LENGTH_ERROR_MESSAGE)
+      .max(USERNAME_MAX_LENGTH, USERNAME_LENGTH_ERROR_MESSAGE)
+      .trim(),
+    email: z
+      .string({
+        required_error: REQUIRED_ERROR_MESSAGE("이메일"),
+      })
+      .email()
+      .toLowerCase(),
     password: z
-      .string()
+      .string({
+        required_error: REQUIRED_ERROR_MESSAGE("비밀번호"),
+      })
+      .min(PASSWORD_MIN_LENGTH, PASSWORD_LENGTH_ERROR_MESSAGE)
+      .max(PASSWORD_MAX_LENGTH, PASSWORD_LENGTH_ERROR_MESSAGE)
       .trim()
-      .min(8)
-      .max(20)
-      .regex(
-        passwordRegex,
-        "비밀번호는 1개 이상의 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다."
-      ),
-    confirmPassword: z.string().min(8).max(20),
+      .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR_MESSAGE),
+    confirmPassword: z
+      .string()
+      .min(PASSWORD_MIN_LENGTH, PASSWORD_LENGTH_ERROR_MESSAGE)
+      .max(PASSWORD_MAX_LENGTH, PASSWORD_LENGTH_ERROR_MESSAGE),
   })
   .refine(checkPasswords, {
-    message: "Password와 confromPassword가 일치하지 않습니다.",
+    message: PASSWORD_CHECK_ERROR_MESSAGE,
     path: ["confirmPassword"],
   });
 
@@ -52,6 +63,7 @@ export async function createAccount(prevState: any, formData: FormData) {
   };
   const result = formSchema.safeParse(data);
   if (!result.success) {
+    console.log(result.error);
     return result.error.flatten();
   } else {
     console.log(result.data);
