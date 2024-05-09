@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 
-export default function SocilaLogin() {
+export default function SocialLogin() {
   return (
     <>
       <div className="w-full h-px bg-neutral-500" />
