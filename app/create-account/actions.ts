@@ -19,7 +19,7 @@ import {
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
-import getSession from "@/lib/session";
+import sessionLogin from "@/lib/session-login";
 
 const checkPasswords = ({
   password,
@@ -122,9 +122,7 @@ export async function createAccount(prevState: any, formData: FormData) {
         id: true,
       },
     });
-    const session = await getSession();
-    session.id = user.id;
-    await session.save();
+    await sessionLogin(user.id);
     redirect("/profile");
   }
 }

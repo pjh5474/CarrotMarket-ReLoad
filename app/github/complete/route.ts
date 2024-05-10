@@ -1,5 +1,5 @@
 import db from "@/lib/database";
-import getSession from "@/lib/session";
+import sessionLogin from "@/lib/session-login";
 import { notFound, redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
@@ -44,9 +44,7 @@ export async function GET(request: NextRequest) {
     },
   });
   if (user) {
-    const session = await getSession();
-    session.id = user.id;
-    await session.save();
+    await sessionLogin(user.id);
     return redirect("/profile");
   }
   const newUser = await db.user.create({
@@ -59,8 +57,6 @@ export async function GET(request: NextRequest) {
       id: true,
     },
   });
-  const session = await getSession();
-  session.id = newUser.id;
-  await session.save();
+  await sessionLogin(newUser.id);
   return redirect("/profile");
 }

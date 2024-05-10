@@ -13,8 +13,8 @@ import {
 } from "@/lib/errors";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import getSession from "@/lib/session";
 import { redirect } from "next/navigation";
+import sessionLogin from "@/lib/session-login";
 
 const checkEmailExists = async (email: string) => {
   const user = await db.user.findUnique({
@@ -67,9 +67,7 @@ export const login = async (prevState: any, formData: FormData) => {
       user!.password ?? "xxxx"
     );
     if (ok) {
-      const session = await getSession();
-      session.id = user!.id;
-      await session.save();
+      await sessionLogin(user!.id);
       redirect("/profile");
     } else {
       return {
