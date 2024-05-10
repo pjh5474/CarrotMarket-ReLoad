@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id         Int        @id @default(autoincrement())
-  username   String     @unique
-  email      String?    @unique
-  password   String?
-  phone      String?    @unique
-  github_id  String?    @unique
-  avatar     String?    @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWtg5J3C5iNnqUBT2j5FHXP752KaiTG-NENPeYXad5fg&s")
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  SMSToken   SMSToken[]
+  id           Int        @id @default(autoincrement())
+  username     String     @unique
+  email        String?    @unique
+  password     String?
+  phone        String?    @unique
+  github_id    String?    @unique
+  github_email String?    @unique
+  avatar       String?    @default("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWtg5J3C5iNnqUBT2j5FHXP752KaiTG-NENPeYXad5fg&s")
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+  SMSToken     SMSToken[]
 }
 
 model SMSToken {
