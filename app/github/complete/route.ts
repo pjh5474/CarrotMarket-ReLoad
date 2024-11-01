@@ -31,11 +31,21 @@ export async function GET(request: NextRequest) {
     await sessionLogin(user.id);
     return redirect("/profile");
   }
+
+  const preUserWithUsername = await db.user.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      id: true,
+    },
+  });
+
   const newUser = await db.user.create({
     data: {
       github_id,
       avatar: avatar_url,
-      username,
+      username: preUserWithUsername ? username + "_github" : username,
       github_email,
     },
     select: {

@@ -16,6 +16,5 @@ export default async function getGithubEmail(
       break;
     }
   }
-
   return email;
 }
