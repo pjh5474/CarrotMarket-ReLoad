@@ -1,5 +1,7 @@
 "use server";
 
+import { Vonage } from "@vonage/server-sdk";
+import { Auth } from "@vonage/auth";
 import crypto from "crypto";
 import { z } from "zod";
 import validator from "validator";
@@ -9,8 +11,9 @@ import {
 } from "@/lib/constants";
 import { redirect } from "next/navigation";
 import db from "@/lib/database";
-import getSession from "@/lib/session";
 import sessionLogin from "@/lib/session-login";
+
+let UserPhoneNumber: string;
 
 const phoneSchema = z
   .string()
@@ -21,25 +24,31 @@ const phoneSchema = z
   );
 
 async function tokenExists(token: number) {
-  const exists = await db.sMSToken.findUnique({
+  const smsToken = await db.sMSToken.findUnique({
     where: {
       token: token.toString(),
     },
     select: {
       id: true,
+      phone: true,
     },
   });
-  return Boolean(exists);
+
+  return Boolean(smsToken && smsToken?.phone === UserPhoneNumber);
 }
 
 const tokenSchema = z.coerce
   .number()
   .min(VALIDATION_TOKEN_MIN_LENGTH)
   .max(VALIDATION_TOKEN_MAX_LENGTH)
-  .refine(tokenExists, "This token does not exist.");
+  .refine(
+    tokenExists,
+    "This token does not exist or not for your phone number."
+  );
 
 interface ActionState {
   token: boolean;
+  phone: string;
 }
 
 async function getToken() {
@@ -62,6 +71,11 @@ async function getToken() {
   }
 }
 
+const credentials = new Auth({
+  apiKey: process.env.VONAGE_API_KEY,
+  apiSecret: process.env.VONAGE_API_SECRET,
+});
+
 export async function smsLogIn(prevState: ActionState, formData: FormData) {
   const phone = formData.get("phone");
   const token = formData.get("token");
@@ -70,6 +84,7 @@ export async function smsLogIn(prevState: ActionState, formData: FormData) {
     if (!result.success) {
       return {
         token: false,
+        phone: "",
         error: result.error.flatten(),
       };
     } else {
@@ -86,6 +101,7 @@ export async function smsLogIn(prevState: ActionState, formData: FormData) {
       await db.sMSToken.create({
         data: {
           token,
+          phone: result.data,
           user: {
             connectOrCreate: {
               where: {
@@ -100,22 +116,42 @@ export async function smsLogIn(prevState: ActionState, formData: FormData) {
         },
       });
 
-      // send the token using twilio
+      // send the token using vonage
+      const vonage = new Vonage(credentials);
+      await vonage.sms
+        .send({
+          to: process.env.MY_PHONE_NUMBER!,
+          //to: result.data,
+          from: process.env.VONAGE_SMS_FROM!,
+          text: `Your Karrot verification code is: ${token}`,
+        })
+        .then((resp) => {
+          console.log("Message sent successfully");
+          console.log(resp);
+        })
+        .catch((err) => {
+          console.log("There was an error sending the messages.");
+          console.error(err);
+        });
       return {
         token: true,
+        phone: result.data,
       };
     }
   } else {
+    UserPhoneNumber = prevState.phone;
     const result = await tokenSchema.safeParseAsync(token);
     if (!result.success) {
       return {
         token: true,
+        phone: UserPhoneNumber,
         error: result.error.flatten(),
       };
     } else {
       const token = await db.sMSToken.findUnique({
         where: {
           token: result.data.toString(),
+          phone: UserPhoneNumber,
         },
         select: {
           id: true,
